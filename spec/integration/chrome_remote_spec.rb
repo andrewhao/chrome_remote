@@ -211,5 +211,18 @@ RSpec.describe ChromeRemote do
 
       expect(result).to eq({"name" => "DOMContentLoaded"})
     end
+
+    it "raises a TimeoutException when it passes over the timeout threshold" do
+      thr = Thread.new do
+        sleep(2)
+        server.send_msg({ method: "Network.requestWillBeSent" }.to_json)
+      end
+
+      expect {
+        client.wait_for("Network.requestWillBeSent", timeout: 1)
+      }.to raise_error(Timeout::Error)
+
+      thr.join
+    end
   end
 end
