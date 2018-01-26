@@ -4,13 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "chrome_remote/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "chrome_remote"
+  spec.name          = "andrewhao-chrome_remote"
   spec.version       = ChromeRemote::VERSION
-  spec.authors       = ["Luismi Cavalle"]
-  spec.email         = ["luismi@lmcavalle.com"]
+  spec.authors       = ["Luismi Cavalle", "Andrew Hao"]
+  spec.email         = ["luismi@lmcavalle.com", "andrew@carbonfive.com"]
 
   spec.summary       = "ChromeRemote is a client implementation of the Chrome DevTools Protocol in Ruby"
-  spec.homepage      = "https://github.com/cavalle/chrome_remote"
+  spec.homepage      = "https://github.com/andrewhao/chrome_remote"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
