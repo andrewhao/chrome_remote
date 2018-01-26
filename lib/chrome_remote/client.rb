@@ -31,13 +31,15 @@ module ChromeRemote
       read_until { false }
     end
 
-    def wait_for(event_name=nil)
-      if event_name
-        msg = read_until { |msg| msg["method"] == event_name }
-      elsif block_given?
-        msg = read_until { |msg| yield(msg["method"], msg["params"]) }
+    def wait_for(event_name=nil, timeout: nil)
+      Timeout::timeout(timeout) do
+        if event_name
+          msg = read_until { |msg| msg["method"] == event_name }
+        elsif block_given?
+          msg = read_until { |msg| yield(msg["method"], msg["params"]) }
+        end
+        Hashie::Mash.new(msg["params"])
       end
-      Hashie::Mash.new(msg["params"])
     end
 
     private
