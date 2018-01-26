@@ -1,4 +1,5 @@
 require "chrome_remote/web_socket_client"
+require 'hashie/mash'
 
 module ChromeRemote
   class Client
@@ -6,16 +7,16 @@ module ChromeRemote
 
     def initialize(ws_url)
       @ws = WebSocketClient.new(ws_url)
-      @handlers = Hash.new {|hash, key| hash[key] = [] }
+      @handlers = Hash.new { |hash, key| hash[key] = [] }
     end
-  
-    def send_cmd(command, params = {})  
+
+    def send_cmd(command, params = {})
       msg_id = generate_unique_id
-      
+
       ws.send_msg({method: command, params: params, id: msg_id}.to_json)
-      
+
       msg = read_until { |msg| msg["id"] == msg_id }
-      msg["result"]
+      Hashie::Mash.new(msg["result"])
     end
 
     def on(event_name, &block)
@@ -30,13 +31,17 @@ module ChromeRemote
       read_until { false }
     end
 
-    def wait_for(event_name)
-      msg = read_until { |msg| msg["method"] == event_name }
-      msg["params"]
+    def wait_for(event_name=nil)
+      if event_name
+        msg = read_until { |msg| msg["method"] == event_name }
+      elsif block_given?
+        msg = read_until { |msg| yield(msg["method"], msg["params"]) }
+      end
+      Hashie::Mash.new(msg["params"])
     end
-  
+
     private
-  
+
     def generate_unique_id
       @last_id ||= 0
       @last_id += 1
